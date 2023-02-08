@@ -2,9 +2,11 @@ package com.KoreaIT.java.BasicAM;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Scanner;
 
+import com.KoreaIT.java.BasicAM.controller.ArticleController;
+import com.KoreaIT.java.BasicAM.controller.Controller;
+import com.KoreaIT.java.BasicAM.controller.MemberController;
 import com.KoreaIT.java.BasicAM.dto.Article;
 import com.KoreaIT.java.BasicAM.dto.Member;
 import com.KoreaIT.java.BasicAM.util.Util;
@@ -14,7 +16,6 @@ public class App {
 	public static List<Member> members;
 
 	static {
-
 		articles = new ArrayList<>();
 		members = new ArrayList<>();
 	}
@@ -26,149 +27,61 @@ public class App {
 
 		Scanner sc = new Scanner(System.in);
 
-		while (true) {
+		MemberController memberController = new MemberController(members, sc);
+		ArticleController articleController = new ArticleController(articles, sc);
 
+		while (true) {
 			System.out.printf("명령어 ) ");
 			String command = sc.nextLine().trim();
 
 			if (command.length() == 0) {
 				System.out.println("명령어를 입력해주세요");
 				continue;
-
 			}
 
 			if (command.equals("system exit")) {
 				break;
 			}
 
-			if (command.equals("member join")) {
-				int id = members.size() + 1;
-				String regDate = Util.getNowDateStr();
-				String loginId = null;
-				while (true){
-					System.out.printf("로그인 아이디 : ");
-					loginId = sc.nextLine();
-					if(getMemberByLoginId(loginId)==null){
-						System.out.println("아이디가 중복되었습니다. ");
-						continue;
-					}
-					break;
-				}
-				String loginPw = null;
-				String loginPwConfirm = null;
-				while (true) {
-					System.out.printf("로그인 비밀번호 : ");
-					loginPw = sc.nextLine();
-					System.out.printf("로그인 비밀번호 확인: ");
-					loginPwConfirm = sc.nextLine();
+			String[] commandBits = command.split(" "); // article detail 1 / member join
 
-					if (loginPw.equals(loginPwConfirm) == false) {
-						System.out.println("비밀번호를 다시 입력해주세요");
-						continue;
-					}
-
-					break;
-				}
-				System.out.printf("이름 : ");
-				String name = sc.nextLine();
-
-				Member member = new Member(id, regDate, regDate, loginId, loginPw, name);
-				members.add(member);
-
-				System.out.printf("%d번 회원이 가입 되었습니다\n", id);
-
-			} else if (command.equals("article list")) {
-				if (articles.size() == 0) {
-					System.out.println("게시글이 없습니다");
-					continue;
-				}
-				System.out.println("번호    /      제목     /     조회    ");
-				String tempTitle = null;
-				for (int i = articles.size() - 1; i >= 0; i--) {
-					Article article = articles.get(i);
-					if (article.title.length() > 4) {
-						tempTitle = article.title.substring(0, 4);
-						System.out.printf("%4d	/    %6s    /   %4d\n", article.id, tempTitle + "...", article.hit);
-						continue;
-					}
-
-					System.out.printf("%4d	/    %6s    /   %4d\n", article.id, article.title, article.hit);
-				}
-			} else if (command.equals("article write")) {
-				int id = articles.size() + 1;
-				String regDate = Util.getNowDateStr();
-				System.out.printf("제목 : ");
-				String title = sc.nextLine();
-				System.out.printf("내용 : ");
-				String body = sc.nextLine();
-
-				Article article = new Article(id, regDate, regDate, title, body);
-				articles.add(article);
-
-				System.out.printf("%d번 글이 생성 되었습니다\n", id);
-			} else if (command.startsWith("article detail ")) {
-				String[] commandBits = command.split(" ");
-
-				int id = Integer.parseInt(commandBits[2]);
-
-				Article foundArticle = getArticleById(id);
-
-				if (foundArticle == null) {
-					System.out.printf("%d번 게시물은 존재하지 않습니다.\n", id);
-					continue;
-				}
-
-				foundArticle.increaseHit();
-				System.out.printf("번호 : %d\n", foundArticle.id);
-				System.out.printf("작성날짜 : %s\n", foundArticle.regDate);
-				System.out.printf("수정날짜 : %s\n", foundArticle.updateDate);
-				System.out.printf("제목 : %s\n", foundArticle.title);
-				System.out.printf("내용 : %s\n", foundArticle.body);
-				System.out.printf("조회 : %d\n", foundArticle.hit);
-
-			} else if (command.startsWith("article modify ")) {
-				String[] commandBits = command.split(" ");
-
-				int id = Integer.parseInt(commandBits[2]);
-
-				Article foundArticle = getArticleById(id);
-
-				if (foundArticle == null) {
-					System.out.printf("%d번 게시물은 존재하지 않습니다.\n", id);
-					continue;
-				}
-
-				System.out.printf("제목 : ");
-				String title = sc.nextLine();
-				System.out.printf("내용 : ");
-				String body = sc.nextLine();
-				String updateDate = Util.getNowDateStr();
-
-				foundArticle.title = title;
-				foundArticle.body = body;
-				foundArticle.updateDate = updateDate;
-
-				System.out.printf("%d번 게시물을 수정했습니다\n", id);
-
-			} else if (command.startsWith("article delete ")) {
-				String[] commandBits = command.split(" ");
-
-				int id = Integer.parseInt(commandBits[2]);
-
-				int foundIndex = getArticleIndexById(id);
-
-				if (foundIndex == -1) {
-					System.out.printf("%d번 게시물은 존재하지 않습니다.\n", id);
-					continue;
-				}
-				articles.remove(foundIndex);
-				System.out.printf("%d번 게시물을 삭제했습니다\n", id);
-
+			if (commandBits.length == 1) {
+				System.out.println("명령어 확인 후 다시 입력해주세요");
+				continue;
 			}
 
-			else {
-				System.out.println("존재하지 않는 명령어입니다");
+			String controllerName = commandBits[0];
+			String actionMethodName = commandBits[1];
+
+			Controller controller = null;
+
+			if (controllerName.equals("article")) {
+				controller = articleController;
+			} else if (controllerName.equals("member")) {
+				controller = memberController;
+			} else {
+				System.out.println("존재하지 않는 명령어 입니다.");
+				continue;
 			}
+
+			controller.doAction(command, actionMethodName);
+
+//			if (command.equals("member join")) {
+//				memberController.doJoin();
+//			} else if (command.equals("article list")) {
+//				articleController.showList();
+//			} else if (command.equals("article write")) {
+//				articleController.doWrite();
+//			} else if (command.startsWith("article detail ")) {
+//				articleController.showDetail(command);
+//			} else if (command.startsWith("article modify ")) {
+//				articleController.doModify(command);
+//			} else if (command.startsWith("article delete ")) {
+//				articleController.doDelete(command);
+//			}
+//			else {
+//				System.out.println("존재하지 않는 명령어입니다");
+//			}
 
 		}
 
@@ -176,36 +89,6 @@ public class App {
 
 		sc.close();
 
-	}
-	public String getMemberByLoginId(String loginId){
-		String mem = "중복아님.";
-		for(Member member : members){
-			if(Objects.equals(member.loginId, loginId)){
-				return null;
-			}
-		}
-		return mem;
-	}
-	public int getArticleIndexById(int id) {
-		int i = 0;
-		for (Article article : articles) {
-			if (article.id == id) {
-				return i;
-			}
-			i++;
-		}
-		return -1;
-	}
-
-	public Article getArticleById(int id) {
-
-		int index = getArticleIndexById(id);
-
-		if (index != -1) {
-			return articles.get(index);
-		}
-
-		return null;
 	}
 
 	public static void makeTestData() {
