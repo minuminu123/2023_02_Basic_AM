@@ -16,6 +16,7 @@ public class ArticleController extends Controller {
 	public ArticleController(List<Article> articles, Scanner sc) {
 		this.articles = articles;
 		this.sc = sc;
+
 	}
 
 	public void doAction(String command, String actionMethodName) {
