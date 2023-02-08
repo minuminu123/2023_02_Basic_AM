@@ -14,6 +14,7 @@ public class App {
 	public static List<Member> members;
 
 	static {
+
 		articles = new ArrayList<>();
 		members = new ArrayList<>();
 	}
