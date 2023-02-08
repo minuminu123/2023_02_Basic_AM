@@ -2,6 +2,7 @@ package com.KoreaIT.java.BasicAM;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 import com.KoreaIT.java.BasicAM.dto.Article;
@@ -41,9 +42,16 @@ public class App {
 			if (command.equals("member join")) {
 				int id = members.size() + 1;
 				String regDate = Util.getNowDateStr();
-				System.out.printf("로그인 아이디 : ");
-				String loginId = sc.nextLine();
-
+				String loginId = null;
+				while (true){
+					System.out.printf("로그인 아이디 : ");
+					loginId = sc.nextLine();
+					if(getMemberByLoginId(loginId)==null){
+						System.out.println("아이디가 중복되었습니다. ");
+						continue;
+					}
+					break;
+				}
 				String loginPw = null;
 				String loginPwConfirm = null;
 				while (true) {
@@ -167,7 +175,15 @@ public class App {
 		sc.close();
 
 	}
-
+	public String getMemberByLoginId(String loginId){
+		String mem = "중복아님.";
+		for(Member member : members){
+			if(Objects.equals(member.loginId, loginId)){
+				return null;
+			}
+		}
+		return mem;
+	}
 	public int getArticleIndexById(int id) {
 		int i = 0;
 		for (Article article : articles) {
